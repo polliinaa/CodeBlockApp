@@ -1,6 +1,5 @@
 package com.example.codeblockapp
 
-import android.hardware.biometrics.BiometricManager
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
@@ -31,7 +30,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Preview
 import com.example.codeblockapp.ui.theme.CodeBlockAppTheme
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -47,7 +45,8 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             CodeBlockAppTheme {
-                MainScreen()
+//                MainScreen()
+                ScreenMakeName()
             }
         }
     }
@@ -74,104 +73,7 @@ fun MainScreen(){
     }
 }
 
-//ОТОБРАЖЕНИЕ ВЕРХНЕЙ ЧАСТИ ЭКРАНА(НЕИЗМЕНЯЕМА)
-@Composable
-fun Head(){
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .fillMaxHeight(0.15f),
-        contentAlignment = Alignment.Center
 
-    ){
-        Text(text = stringResource(id = R.string.my_algorithms),
-            modifier = Modifier,
-            color = colorResource(R.color.dark_purple),
-            fontSize = 40.sp,
-            fontFamily = Tektur,
-            fontWeight = FontWeight.SemiBold,
-        )
-    }
-}
-
-//ОТОБРАЖЕНИЕ ТОГО, ЧТО У ПОЛЬЗОВАТЕЛЯ НЕТ СОХРАНЕННЫХ АЛГОРИТМОВ(надпись, кнопка, картинка)
-@Composable
-fun EmptyStateContent() {
-
-    Column(
-        modifier = Modifier
-            .fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center,
-    ) {
-
-        Box(
-            modifier = Modifier
-                .padding(bottom = 20.dp)
-
-        ){
-            Text(text = stringResource(id = R.string.empty_algorithms),
-                color = colorResource(R.color.great),
-                fontFamily = Arimo,
-                fontWeight = FontWeight.Normal,
-                fontSize = 16.sp,
-                )
-        }
-
-        Box (
-            modifier = Modifier
-                .padding(bottom = 40.dp)
-        ){
-
-            Button(
-                onClick = {
-                    Log.d("info", "Переход к экрану создания")
-                },
-
-                modifier = Modifier
-                    .width(296.dp)
-                    .height(53.dp)
-                ,
-
-                shape = RoundedCornerShape(22.dp),
-
-                elevation = ButtonDefaults.buttonElevation(
-                    defaultElevation = 6.dp,
-                    pressedElevation = 10.dp,
-                ),
-
-                colors = ButtonDefaults.buttonColors(
-                    contentColor = Color.White,
-                    containerColor = colorResource(R.color.light_purple),
-                ),
-
-            ) {
-                Text(text = stringResource(R.string.button_create_new_algorithm),
-                    fontFamily = Arimo,
-                    fontWeight = FontWeight.Normal,
-                    fontSize = 20.sp
-                )
-            }
-        }
-
-        Box () {
-            Image(
-                painter = painterResource(id = R.drawable.icon_empty_algorithms),
-                contentDescription = "",
-                modifier = Modifier
-                    .padding(start = 50.dp, top = 70.dp, end = 50.dp, bottom = 0.dp)
-                    .size(170.dp),
-            )
-        }
-    }
-}
-
-@Composable
-fun AlgorithmList(algorithms: SnapshotStateList<String>){
-
-
-
-}
 
 
 

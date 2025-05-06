@@ -3,4 +3,7 @@
     <string name="my_algorithms">Мои алгоритмы</string>
     <string name="empty_algorithms">У вас пока нет алгоритмов</string>
     <string name="button_create_new_algorithm">Создать новый алгоритм</string>
+    <string name="go_back">Назад</string>
+    <string name="create_the_name_for_new_algorithm">Придумайте название алгоритму</string>
+    <string name="go_next">Продолжить</string>
 </resources>
