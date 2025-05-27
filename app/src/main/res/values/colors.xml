@@ -4,4 +4,19 @@
     <color name="dark_purple">#595880</color>
     <color name="great">#787971</color>
     <color name="light_purple">#AFAFE0</color>
+    <color name="light_green">#ACBD6F</color>
+    <color name="orange">#F16F33</color>
+    <color name="light_orange">#FCE1A8</color>
+    <color name="grape_juice">#6C1F41</color>
+    <color name="lilacs">#D3B6D4</color>
+    <color name="butter_yellow">#EECE7B</color>
+    <color name="blood_orange">#EE6F3C</color>
+    <color name="peach_frost">#F3BEAE</color>
+    <color name="dry_earth">#876029</color>
+    <color name="light_great">#D9D9D9</color>
+    <color name="iced_blue">#B8CDE8</color>
+    <color name="tea_green">#AACC97</color>
+    <color name="forest">#26533F</color>
+    <color name="very_light_green">#E2E6D4</color>
+
 </resources>

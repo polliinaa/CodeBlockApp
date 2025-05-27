@@ -3,4 +3,23 @@
     <string name="my_algorithms">Мои алгоритмы</string>
     <string name="empty_algorithms">У вас пока нет алгоритмов</string>
     <string name="button_create_new_algorithm">Создать новый алгоритм</string>
+    <string name="go_back">Назад</string>
+    <string name="create_the_name_for_new_algorithm">Придумайте название алгоритму</string>
+    <string name="go_next">Продолжить</string>
+    <string name="to_save">Сохранить</string>
+    <string name="add_block">Добавить блоки</string>
+    <string name="start_algorithm">▷</string>
+    <string name="declare_a_variable">Объявить переменную</string>
+    <string name="name_variable">Имя:</string>
+    <string name="value_of_variable">Значение:</string>
+    <string name="assign_a_variable">Присвоить переменной</string>
+    <string name="start_block">Начало</string>
+    <string name="finish_block">Конец</string>
+    <string name="print_block">Вывести на экран</string>
+    <string name="if_block">Если</string>
+    <string name="condition">Условие:</string>
+    <string name="start_block_program">Начало программы</string>
+    <string name="finish_block_program">Конец программы</string>
+    <string name="select_variable">Выберите переменную</string>
+
 </resources>
