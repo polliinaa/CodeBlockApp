@@ -1,7 +1,7 @@
-package com.example.codeblockapp
+package com.example.codeblockapp.screens
 
-import android.util.Log
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -17,6 +17,8 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -27,8 +29,30 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import com.example.codeblockapp.R
+import com.example.codeblockapp.navigation.ScreenNavigation
 import com.example.codeblockapp.ui.theme.Arimo
 import com.example.codeblockapp.ui.theme.Tektur
+
+@Composable
+fun MainScreen(navController: NavController){
+    val algorithms = remember { mutableStateListOf<String>() }
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(colorResource(R.color.light_yellow))
+    ) {
+        Head()
+        if (algorithms.isEmpty()){
+            EmptyStateContent(navController = navController)
+        } else {
+
+        }
+
+    }
+}
 
 //ОТОБРАЖЕНИЕ ВЕРХНЕЙ ЧАСТИ ЭКРАНА(НЕИЗМЕНЯЕМА)
 @Composable
@@ -52,7 +76,7 @@ fun Head(){
 
 //ОТОБРАЖЕНИЕ ТОГО, ЧТО У ПОЛЬЗОВАТЕЛЯ НЕТ СОХРАНЕННЫХ АЛГОРИТМОВ(надпись, кнопка, картинка)
 @Composable
-fun EmptyStateContent() {
+fun EmptyStateContent(navController: NavController) {
 
     Column(
         modifier = Modifier
@@ -81,7 +105,7 @@ fun EmptyStateContent() {
 
             Button(
                 onClick = {
-                    Log.d("info", "Переход к экрану создания")
+                    navController.navigate(route = ScreenNavigation.MakeNameForAlgorithm.route)
                 },
 
                 modifier = Modifier

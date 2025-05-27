@@ -1,4 +1,4 @@
-package com.example.codeblockapp
+package com.example.codeblockapp.screens
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
@@ -35,15 +35,20 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import com.example.codeblockapp.R
+import com.example.codeblockapp.navigation.ScreenNavigation
 import com.example.codeblockapp.ui.theme.Arimo
 import com.example.codeblockapp.ui.theme.Tektur
 
-@Preview
+
 @Composable
-fun ScreenMakeName(){
+fun ScreenMakeName(navController: NavController){
+
+    var name by remember { mutableStateOf("New algorithm") }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -51,10 +56,10 @@ fun ScreenMakeName(){
         horizontalAlignment = Alignment.CenterHorizontally
 
     ) {
-        ButtonGoBack()
+        ButtonGoBack(navController)
         TextCreateTheName()
-        InputNameOfAlgorithm()
-        ButtonGoNext()
+        InputNameOfAlgorithm(name = name, onNameChange = {name = it})
+        ButtonGoNext(navController, name)
         PrintIcon()
     }
 
@@ -62,7 +67,7 @@ fun ScreenMakeName(){
 
 //КНОПКА СЛЕВА СВЕРХУ "НАЗАД"
 @Composable
-fun ButtonGoBack(){
+fun ButtonGoBack(navController: NavController){
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -73,7 +78,8 @@ fun ButtonGoBack(){
     ){
        OutlinedButton (
            onClick = {
-            //навигация на главный экран
+            //navController.navigate(route = ScreenNavigation.Home.route)
+               navController.popBackStack()
             },
 
            colors = ButtonDefaults.outlinedButtonColors(
@@ -122,13 +128,13 @@ fun TextCreateTheName() {
 }
 
 @Composable
-fun InputNameOfAlgorithm(){
+fun InputNameOfAlgorithm(name: String, onNameChange: (String) -> Unit){
 
     Box () {
 
-        var name by remember { mutableStateOf("") }
-        OutlinedTextField(name,
-            onValueChange = { name = it },
+        OutlinedTextField(
+            value = name,
+            onValueChange = onNameChange,
 
             modifier = Modifier
                 .fillMaxWidth(0.8f)
@@ -168,12 +174,14 @@ fun InputNameOfAlgorithm(){
 
 //КНОПКА "ПРОДОЛЖИТЬ"
 @Composable
-fun ButtonGoNext(){
+fun ButtonGoNext(navController: NavController, name: String){
     Box(
         modifier = Modifier
             .padding(top = 10.dp),
     ) {
-        Button(onClick = {/*/переход к экрану создания*/},
+        Button(onClick = {
+            navController.navigate(route = ScreenNavigation.CreateAlgorithm.createRoute(name))
+        },
             modifier = Modifier
                 .width(166.dp)
                 .height(53.dp),
