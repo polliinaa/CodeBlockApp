@@ -53,24 +53,39 @@ fun DeclareVariableBlockPreview(
 ) {
     var xOffset by remember { mutableStateOf(block.x) }
     var yOffset by remember { mutableStateOf(block.y) }
+    
+    var name by remember(block.id) { mutableStateOf(block.name) }
+    var value by remember(block.id) { mutableStateOf(block.value) }
 
     Box(
         modifier = Modifier
             .offset { IntOffset(xOffset.roundToInt(), yOffset.roundToInt()) }
             .pointerInput(Unit) {
-                detectDragGestures { _, distance ->
-                    xOffset += distance.x
-                    yOffset += distance.y
+                detectDragGestures { change, dragAmount ->
+                    change.consume()
+                    xOffset += dragAmount.x
+                    yOffset += dragAmount.y
                     onUpdate(block.copy(
                         x = xOffset,
                         y = yOffset,
-                        name = block.name,
-                        value = block.value
+                        name = name,
+                        value = value
                     ))
                 }
             }
     ) {
-        DeclareVariableBlockUI(block, variables, onUpdate)
+        DeclareVariableBlockUI(
+            block = block.copy(
+                name = name,
+                value = value
+            ),
+            variables = variables,
+            onUpdate = { updatedBlock ->
+                name = updatedBlock.name
+                value = updatedBlock.value
+                onUpdate(updatedBlock.copy(x = xOffset, y = yOffset))
+            }
+        )
     }
 }
 
@@ -121,13 +136,11 @@ fun DeclareVariableBlockUI(
                 BasicTextField(
                     value = block.name,
                     onValueChange = { newName ->
-                        // удаляем старые переменные
                         block.name.split(",")
                             .map { it.trim() }
                             .filter { it.isNotEmpty() }
                             .forEach { variables.remove(it) }
 
-                        // обновляем блок
                         onUpdate(block.copy(
                             name = newName,
                             value = block.value,
@@ -135,7 +148,6 @@ fun DeclareVariableBlockUI(
                             y = block.y
                         ))
 
-                        // добавляем новые переменные
                         newName.split(",")
                             .map { it.trim() }
                             .filter { it.isNotEmpty() }
@@ -184,7 +196,6 @@ fun DeclareVariableBlockUI(
                 BasicTextField(
                     value = block.value,
                     onValueChange = { newValue ->
-                        // обновляем блок
                         onUpdate(block.copy(
                             value = newValue,
                             name = block.name,
@@ -192,7 +203,6 @@ fun DeclareVariableBlockUI(
                             y = block.y
                         ))
 
-                        // обновляем значения всех переменных
                         block.name.split(",")
                             .map { it.trim() }
                             .filter { it.isNotEmpty() }
@@ -224,7 +234,6 @@ fun DeclareVariableBlockUI(
                     keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
                     keyboardActions = KeyboardActions(
                         onDone = {
-                            // обновляем значения при нажатии Done
                             block.name.split(",")
                                 .map { it.trim() }
                                 .filter { it.isNotEmpty() }

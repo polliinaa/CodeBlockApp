@@ -21,5 +21,9 @@
     <string name="start_block_program">Начало программы</string>
     <string name="finish_block_program">Конец программы</string>
     <string name="select_variable">Выберите переменную</string>
+    <string name="program_output">Program Output</string>
+    <string name="no_output">No output generated</string>
+    <string name="ok">OK</string>
+
 
 </resources>
