@@ -1,5 +1,6 @@
 package com.example.codeblockapp.screens.blocks
 
+import ExpressionEvaluator
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.detectDragGestures
@@ -46,93 +47,88 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.codeblockapp.R
-import com.example.codeblockapp.model.Variables
+import com.example.codeblockapp.model.blocks.ConditionIFBlockData
+import com.example.codeblockapp.model.blocks.FinishBlockData
+import com.example.codeblockapp.model.blocks.StartBlockData
 import com.example.codeblockapp.ui.theme.Arimo
 import com.example.codeblockapp.ui.theme.Tektur
 import kotlin.math.roundToInt
 
-@Preview(showBackground = true)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun IFBlockPreview() {
-    var xOffsetMainIFBlock by remember { mutableStateOf(0f) }
-    var yOffsetMainIFBlock by remember { mutableStateOf(0f) }
-
-    var xOffsetStartIFBlock by remember { mutableStateOf(0f) }
-    var yOffsetStartIFBlock by remember { mutableStateOf(0f) }
-
-    var xOffsetEndIFBlock by remember { mutableStateOf(0f) }
-    var yOffsetEndIFBlock by remember { mutableStateOf(0f) }
+fun IFBlockPreview(
+    block: ConditionIFBlockData,
+    onUpdate: (ConditionIFBlockData) -> Unit,
+    variables: Map<String, Int>,
+    evaluator: ExpressionEvaluator
+) {
+    var xOffset by remember { mutableStateOf(block.x) }
+    var yOffset by remember { mutableStateOf(block.y) }
+    
+    // Сохраняем состояние полей ввода
+    var valueLeft by remember(block.id) { mutableStateOf(block.valueLeft) }
+    var valueRight by remember(block.id) { mutableStateOf(block.valueRight) }
+    var selectedOperation by remember(block.id) { mutableStateOf(block.selectedConditionOperation) }
 
     Box(modifier = Modifier
-        .offset { IntOffset(xOffsetMainIFBlock.roundToInt(), yOffsetMainIFBlock.roundToInt()) }
-        //.padding(30.dp)
-        //.fillMaxSize()
+        .offset { IntOffset(xOffset.roundToInt(), yOffset.roundToInt()) }
         .pointerInput(Unit) {
-            detectDragGestures { _, distance ->
-                xOffsetMainIFBlock += distance.x
-                yOffsetMainIFBlock += distance.y
+            detectDragGestures { change, dragAmount ->
+                change.consume()
+                xOffset += dragAmount.x
+                yOffset += dragAmount.y
+                onUpdate(block.safeCopy(
+                    x = xOffset,
+                    y = yOffset,
+                    valueLeft = valueLeft,
+                    valueRight = valueRight,
+                    selectedConditionOperation = selectedOperation
+                ))
             }
         }
     ) {
-        IFBlockUI()
-    }
-
-    Box(modifier = Modifier
-        .offset { IntOffset(xOffsetStartIFBlock.roundToInt(), yOffsetStartIFBlock.roundToInt()) }
-        //.padding(30.dp)
-        //.fillMaxSize()
-        .pointerInput(Unit) {
-            detectDragGestures { _, distance ->
-                xOffsetStartIFBlock += distance.x
-                yOffsetStartIFBlock += distance.y
-            }
-        }
-    ) {
-        IFStartBlock()
-    }
-
-    Box(modifier = Modifier
-        .offset { IntOffset(xOffsetEndIFBlock.roundToInt(), yOffsetEndIFBlock.roundToInt()) }
-        //.padding(30.dp)
-        //.fillMaxSize()
-        .pointerInput(Unit) {
-            detectDragGestures { _, distance ->
-                xOffsetEndIFBlock += distance.x
-                yOffsetEndIFBlock += distance.y
-            }
-        }
-    ) {
-        IFEndBlock()
+        IFBlockUI(
+            block = block.copy(
+                valueLeft = valueLeft,
+                valueRight = valueRight,
+                selectedConditionOperation = selectedOperation
+            ),
+            onUpdate = { updatedBlock ->
+                valueLeft = updatedBlock.valueLeft
+                valueRight = updatedBlock.valueRight
+                selectedOperation = updatedBlock.selectedConditionOperation
+                onUpdate(updatedBlock.safeCopy(x = xOffset, y = yOffset))
+            },
+            variables = variables,
+            evaluator = evaluator
+        )
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun IFBlockUI() {
-
-    var valueLeft by remember { mutableStateOf("") }
-    var valueRight by remember { mutableStateOf("") }
-
-    val conditionsOperations = mutableListOf(">", "<", "==", "!=", ">=", "<=")
-
+fun IFBlockUI(
+    block: ConditionIFBlockData,
+    onUpdate: (ConditionIFBlockData) -> Unit,
+    variables: Map<String, Int>,
+    evaluator: ExpressionEvaluator
+) {
+    val conditionsOperations = listOf(">", "<", "==", "!=", ">=", "<=")
     var isExpandedOfConditionOperation by remember { mutableStateOf(false) }
-    var selectedConditionOperation by remember { mutableStateOf(conditionsOperations[0]) }
 
-    PuzzleBlockForVariables(color_bg = colorResource(R.color.butter_yellow),
+    PuzzleBlockForVariables(
+        color_bg = colorResource(R.color.butter_yellow),
         color_style = colorResource(R.color.grape_juice),
-    )
-    {
-
+    ) {
         Column {
+            // Заголовок IF
             Box(
                 modifier = Modifier
-                    //.background(Color.Blue)
                     .fillMaxWidth()
                     .fillMaxHeight(0.25f)
                     .padding(end = 15.dp),
                 contentAlignment = Alignment.CenterEnd,
-            )
-            {
+            ) {
                 Text(
                     text = stringResource(R.string.if_block),
                     fontFamily = Tektur,
@@ -142,17 +138,14 @@ fun IFBlockUI() {
                 )
             }
 
+            // Условие
             Row(
                 modifier = Modifier
-                    //.background(Color.Green)
                     .padding(start = 15.dp, end = 15.dp)
                     .fillMaxWidth()
                     .fillMaxHeight(0.4f),
                 verticalAlignment = Alignment.CenterVertically,
-
-
-                ) {
-
+            ) {
                 Text(
                     text = stringResource(R.string.condition),
                     fontFamily = Arimo,
@@ -162,34 +155,27 @@ fun IFBlockUI() {
                 )
             }
 
+
             Row(
                 modifier = Modifier
-                    //.background(Color.Magenta)
-                    //.padding(start = 5.dp, end = 5.dp)
                     .fillMaxWidth()
                     .fillMaxHeight(0.8f),
                 verticalAlignment = Alignment.Top,
                 horizontalArrangement = Arrangement.Center
             ) {
+                // левое выражение
                 BasicTextField(
-                    value = valueLeft,
-                    onValueChange = { valueLeft = it },
+                    value = block.valueLeft,
+                    onValueChange = {
+                        onUpdate(block.safeCopy(valueLeft = it))
+                    },
                     modifier = Modifier
-                        //.padding(start = 10.dp)
-                        //.height(28.dp)
                         .heightIn(min = 28.dp, max = 50.dp)
                         .width(109.dp)
-                        //.wrapContentWidth()
-                        .wrapContentHeight()
                         .background(
                             color = colorResource(R.color.light_great),
                             shape = RoundedCornerShape(1.dp)
                         )
-//                        .border(
-//                            width = 1.dp,
-//                            color = colorResource(R.color.lilacs),
-//                            shape = RoundedCornerShape(1.dp)
-//                        )
                         .padding(horizontal = 7.dp, vertical = 6.dp),
                     textStyle = TextStyle(
                         fontFamily = Arimo,
@@ -201,13 +187,11 @@ fun IFBlockUI() {
                     maxLines = 3
                 )
 
-                Box(
-                    modifier = Modifier
-                        .padding(start = 10.dp, end = 10.dp)
-                ){
+                // оператор сравнения
+                Box(modifier = Modifier.padding(start = 10.dp, end = 10.dp)) {
                     ExposedDropdownMenuBox(
                         expanded = isExpandedOfConditionOperation,
-                        onExpandedChange = {isExpandedOfConditionOperation = !isExpandedOfConditionOperation},
+                        onExpandedChange = { isExpandedOfConditionOperation = !isExpandedOfConditionOperation },
                         modifier = Modifier
                             .background(
                                 color = colorResource(R.color.blood_orange),
@@ -221,36 +205,22 @@ fun IFBlockUI() {
                                     color = colorResource(R.color.blood_orange),
                                     shape = RoundedCornerShape(7.dp)
                                 )
-                                .padding(start = 1.dp, bottom = 5.dp, top = 5.dp, end = 5.dp),
+                                .padding(horizontal = 5.dp, vertical = 5.dp),
                             contentAlignment = Alignment.Center,
                         ) {
                             Row(
                                 verticalAlignment = Alignment.CenterVertically,
                                 horizontalArrangement = Arrangement.Center,
-                                modifier = Modifier
-                                    .width(50.dp)
-                                    .height(20.dp)
+                                modifier = Modifier.width(50.dp).height(20.dp)
                             ) {
-                                BasicTextField(
-                                    value = selectedConditionOperation,
-                                    onValueChange = {},
-                                    readOnly = true,
-                                    textStyle = TextStyle(
-                                        fontFamily = Arimo,
-                                        fontWeight = FontWeight.SemiBold,
-                                        fontSize = 14.sp,
-                                        color = colorResource(R.color.butter_yellow),
-                                        lineHeight = 12.sp,
-                                        textAlign = TextAlign.End
-                                    ),
-                                    modifier = Modifier
-                                        .width(35.dp)
-                                        .height(15.dp)
-                                        .align(Alignment.CenterVertically)
-                                        .padding(end = 8.dp)
-
+                                Text(
+                                    text = block.selectedConditionOperation,
+                                    fontFamily = Arimo,
+                                    fontWeight = FontWeight.SemiBold,
+                                    fontSize = 14.sp,
+                                    color = colorResource(R.color.butter_yellow),
+                                    modifier = Modifier.padding(end = 8.dp)
                                 )
-
                                 Icon(
                                     imageVector = Icons.Filled.ArrowDropDown,
                                     contentDescription = null,
@@ -261,41 +231,35 @@ fun IFBlockUI() {
 
                         ExposedDropdownMenu(
                             expanded = isExpandedOfConditionOperation,
-                            onDismissRequest = {isExpandedOfConditionOperation = false},
+                            onDismissRequest = { isExpandedOfConditionOperation = false },
                         ) {
-                            conditionsOperations.forEachIndexed{ index, conditionOperation ->
+                            conditionsOperations.forEach { conditionOperation ->
                                 DropdownMenuItem(
-                                    text = { Text(text = conditionOperation)},
+                                    text = { Text(text = conditionOperation) },
                                     onClick = {
-                                        selectedConditionOperation = conditionsOperations[index]
-                                        isExpandedOfConditionOperation = false },
+                                        onUpdate(block.safeCopy(selectedConditionOperation = conditionOperation))
+                                        isExpandedOfConditionOperation = false
+                                    },
                                     contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding
                                 )
                             }
                         }
-
                     }
                 }
 
+                // правое выражение
                 BasicTextField(
-                    value = valueRight,
-                    onValueChange = { valueRight = it },
+                    value = block.valueRight,
+                    onValueChange = {
+                        onUpdate(block.safeCopy(valueRight = it))
+                    },
                     modifier = Modifier
-                        //.padding(start = 10.dp)
-                        //.height(28.dp)
                         .heightIn(min = 28.dp, max = 50.dp)
                         .width(109.dp)
-                        //.wrapContentWidth()
-                        .wrapContentHeight()
                         .background(
                             color = colorResource(R.color.light_great),
                             shape = RoundedCornerShape(1.dp)
                         )
-//                        .border(
-//                            width = 1.dp,
-//                            color = colorResource(R.color.lilacs),
-//                            shape = RoundedCornerShape(1.dp)
-//                        )
                         .padding(horizontal = 7.dp, vertical = 6.dp),
                     textStyle = TextStyle(
                         fontFamily = Arimo,
@@ -304,51 +268,89 @@ fun IFBlockUI() {
                         color = colorResource(R.color.grape_juice),
                         lineHeight = 12.sp
                     ),
-                    maxLines = 3,
-
+                    maxLines = 3
                 )
-
             }
+        }
+    }
+}
+@Composable
+fun StartAlgorithmBlockPreview(
+    block: StartBlockData,
+    onUpdate: (StartBlockData) -> Unit
+) {
+    var xOffset by remember { mutableStateOf(block.x) }
+    var yOffset by remember { mutableStateOf(block.y) }
 
+    Box(
+        modifier = Modifier
+            .offset { IntOffset(xOffset.roundToInt(), yOffset.roundToInt()) }
+            .pointerInput(Unit) {
+                detectDragGestures { change, dragAmount ->
+                    change.consume()
+                    xOffset += dragAmount.x
+                    yOffset += dragAmount.y
+                    onUpdate(block.copy(
+                        x = xOffset,
+                        y = yOffset,
+                        parentIfBlockId = block.parentIfBlockId
+                    ))
+                }
+            }
+    ) {
+    PuzzleBlockForStartEnd(
+        color_bg = colorResource(R.color.blood_orange),
+    ) {
+        Text(
+                text = stringResource(R.string.start_block),
+            fontFamily = Tektur,
+            fontWeight = FontWeight.SemiBold,
+            fontSize = 16.sp,
+            color = colorResource(R.color.butter_yellow),
+            textAlign = TextAlign.Center,
+            modifier = Modifier.width(306.dp)
+        )
         }
     }
 }
 
 @Composable
-fun IFStartBlock() {
+fun FinishAlgorithmBlockPreview(
+    block: FinishBlockData,
+    onUpdate: (FinishBlockData) -> Unit
+) {
+    var xOffset by remember { mutableStateOf(block.x) }
+    var yOffset by remember { mutableStateOf(block.y) }
+
+    Box(
+        modifier = Modifier
+            .offset { IntOffset(xOffset.roundToInt(), yOffset.roundToInt()) }
+            .pointerInput(Unit) {
+                detectDragGestures { change, dragAmount ->
+                    change.consume()
+                    xOffset += dragAmount.x
+                    yOffset += dragAmount.y
+                    onUpdate(block.copy(
+                        x = xOffset,
+                        y = yOffset,
+                        parentIfBlockId = block.parentIfBlockId
+                    ))
+                }
+            }
+    ) {
     PuzzleBlockForStartEnd(
         color_bg = colorResource(R.color.blood_orange),
     ) {
-        Text(text = stringResource(R.string.start_block),
+        Text(
+                text = stringResource(R.string.finish_block),
             fontFamily = Tektur,
             fontWeight = FontWeight.SemiBold,
             fontSize = 16.sp,
             color = colorResource(R.color.butter_yellow),
             textAlign = TextAlign.Center,
-            modifier = Modifier
-                .width(306.dp)
-
-
+            modifier = Modifier.width(306.dp)
         )
-    }
-}
-
-@Composable
-fun IFEndBlock() {
-    PuzzleBlockForStartEnd(
-        color_bg = colorResource(R.color.blood_orange),
-    ) {
-        Text(text = stringResource(R.string.finish_block),
-            fontFamily = Tektur,
-            fontWeight = FontWeight.SemiBold,
-            fontSize = 16.sp,
-            color = colorResource(R.color.butter_yellow),
-            textAlign = TextAlign.Center,
-            modifier = Modifier
-                .width(306.dp)
-
-
-        )
+        }
     }
 }
 
