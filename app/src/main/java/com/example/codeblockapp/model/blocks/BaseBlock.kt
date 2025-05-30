@@ -30,16 +30,6 @@ data class DeclareVariableBlockData(
     override val type = BlockType.VARIABLE_DECLARATION
 }
 
-//
-//data class AssignVariableBlockData(
-//    override val id: String = UUID.randomUUID().toString(),
-//    var selectedVariable: String = "",
-//    var newValue: String = "",
-//    override var x: Float = 0f,
-//    override var y: Float = 0f
-//) : BaseBlock() {
-//    override val type = BlockType.VARIABLE_ASSIGNMENT
-//}
 data class AssignVariableBlockData(
     override val id: String = UUID.randomUUID().toString(),
     var selectedVariable: String = "",
@@ -49,7 +39,6 @@ data class AssignVariableBlockData(
 ) : BaseBlock() {
     override val type = BlockType.VARIABLE_ASSIGNMENT
 
-    // Функция для безопасного копирования с сохранением значений
     fun safeCopy(
         x: Float = this.x,
         y: Float = this.y,
@@ -62,31 +51,63 @@ data class AssignVariableBlockData(
         newValue = newValue
     )
 }
-class FunctionPrintBlockData(override val id: String = UUID.randomUUID().toString()) : BaseBlock() {
-    var value = ""
+data class FunctionPrintBlockData(
+    override val id: String = UUID.randomUUID().toString(),
+    var expression: String = "",
+    override var x: Float = 0f,
+    override var y: Float = 0f
+) : BaseBlock() {
     override val type = BlockType.PRINT
-    override var x: Float = 0f
-    override var y: Float = 0f
-
 }
 
-class ConditionIFBlockData(override val id: String = UUID.randomUUID().toString()) : BaseBlock() {
-    var valueLeft = ""
-    var valueRight = ""
-    val condition = ""
+
+
+data class ConditionIFBlockData(
+    override val id: String = UUID.randomUUID().toString(),
+    var valueLeft: String = "",
+    var valueRight: String = "",
+    var selectedConditionOperation: String = "==",
+    var startBlockId: String? = null,
+    var finishBlockId: String? = null,
+    override var x: Float = 0f,
+    override var y: Float = 0f
+) : BaseBlock() {
     override val type = BlockType.IF
-    override var x: Float = 0f
-    override var y: Float = 0f
+
+    fun safeCopy(
+        x: Float = this.x,
+        y: Float = this.y,
+        valueLeft: String = this.valueLeft,
+        valueRight: String = this.valueRight,
+        selectedConditionOperation: String = this.selectedConditionOperation,
+        startBlockId: String? = this.startBlockId,
+        finishBlockId: String? = this.finishBlockId
+    ) = copy(
+        x = x,
+        y = y,
+        valueLeft = valueLeft,
+        valueRight = valueRight,
+        selectedConditionOperation = selectedConditionOperation,
+        startBlockId = startBlockId,
+        finishBlockId = finishBlockId
+    )
 }
 
-class StartBlockData(override val id: String = UUID.randomUUID().toString()) : BaseBlock() {
+data class StartBlockData(
+    override val id: String = UUID.randomUUID().toString(),
+    override var x: Float = 0f,
+    override var y: Float = 0f,
+    var parentIfBlockId: String? = null
+) : BaseBlock() {
     override val type = BlockType.START
-    override var x: Float = 0f
-    override var y: Float = 0f
 }
 
-class FinishBlockData(override val id: String = UUID.randomUUID().toString()) : BaseBlock() {
+data class FinishBlockData(
+    override val id: String = UUID.randomUUID().toString(),
+    override var x: Float = 0f,
+    override var y: Float = 0f,
+    var parentIfBlockId: String? = null
+) : BaseBlock() {
     override val type = BlockType.FINISH
-    override var x: Float = 0f
-    override var y: Float = 0f
 }
+

@@ -18,6 +18,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -33,18 +34,28 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.codeblockapp.R
+import com.example.codeblockapp.model.blocks.BlockType
+import com.example.codeblockapp.model.blocks.FunctionPrintBlockData
 import com.example.codeblockapp.ui.theme.Arimo
 import com.example.codeblockapp.ui.theme.Tektur
 import kotlin.math.roundToInt
 
+
 @Composable
-fun FunctionPrintBlockPreview() {
-    var xOffset by remember { mutableStateOf(0f) }
-    var yOffset by remember { mutableStateOf(0f) }
+fun FunctionPrintBlockPreview(
+    block: FunctionPrintBlockData,
+    onUpdate: (FunctionPrintBlockData) -> Unit
+) {
+    var xOffset by remember { mutableStateOf(block.x) }
+    var yOffset by remember { mutableStateOf(block.y) }
+
+    // Сохраняем позицию при изменении
+    LaunchedEffect(xOffset, yOffset) {
+        onUpdate(block.copy(x = xOffset, y = yOffset))
+    }
+
     Box(modifier = Modifier
         .offset { IntOffset(xOffset.roundToInt(), yOffset.roundToInt()) }
-        //.padding(30.dp)
-        //.fillMaxSize()
         .pointerInput(Unit) {
             detectDragGestures { _, distance ->
                 xOffset += distance.x
@@ -52,31 +63,29 @@ fun FunctionPrintBlockPreview() {
             }
         }
     ) {
-        FunctionPrintBlockUI()
-
+        FunctionPrintBlockUI(block, onUpdate)
     }
 }
 
 @Composable
-fun FunctionPrintBlockUI() {
+fun FunctionPrintBlockUI(
+    block: FunctionPrintBlockData,
+    onUpdate: (FunctionPrintBlockData) -> Unit
+) {
+    var valueOfPrint by remember { mutableStateOf(block.expression) }
 
-    var valueOfPrint by remember { mutableStateOf("") }
-
-    PuzzleBlockForPrint (color_bg = colorResource(R.color.iced_blue),
+    PuzzleBlockForPrint(
+        color_bg = colorResource(R.color.iced_blue),
         color_style = colorResource(R.color.grape_juice),
-    )
-    {
-
+    ) {
         Column {
-            Box(modifier = Modifier
-                //.background(Color.Blue)
-                .fillMaxWidth()
-                .fillMaxHeight(0.37f)
-                .padding(end = 15.dp)
-                ,
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .fillMaxHeight(0.37f)
+                    .padding(end = 15.dp),
                 contentAlignment = Alignment.CenterEnd,
-            )
-            {
+            ) {
                 Text(
                     text = stringResource(R.string.print_block),
                     fontFamily = Tektur,
@@ -88,18 +97,17 @@ fun FunctionPrintBlockUI() {
 
             Row(
                 modifier = Modifier
-                    //.background(Color.Green)
                     .padding(start = 15.dp, end = 15.dp)
                     .fillMaxWidth()
-                    .fillMaxHeight(0.75f)
-                ,
+                    .fillMaxHeight(0.75f),
                 verticalAlignment = Alignment.CenterVertically,
-
-
-                ) {
+            ) {
                 BasicTextField(
                     value = valueOfPrint,
-                    onValueChange = { valueOfPrint = it },
+                    onValueChange = { newValue ->
+                        valueOfPrint = newValue
+                        onUpdate(block.copy(expression = newValue))
+                    },
                     modifier = Modifier
                         .padding(start = 10.dp)
                         .height(28.dp)
@@ -109,11 +117,6 @@ fun FunctionPrintBlockUI() {
                             color = colorResource(R.color.light_great),
                             shape = RoundedCornerShape(1.dp)
                         )
-//                        .border(
-//                            width = 1.dp,
-//                            color = colorResource(R.color.grape_juice),
-//                            shape = RoundedCornerShape(1.dp)
-//                        )
                         .padding(horizontal = 7.dp, vertical = 6.dp),
                     textStyle = TextStyle(
                         fontFamily = Arimo,
@@ -124,7 +127,6 @@ fun FunctionPrintBlockUI() {
                     ),
                     singleLine = true
                 )
-
             }
         }
     }
