@@ -1,4 +1,4 @@
-package com.example.codeblockapp
+package com.example.codeblock
 
 import org.junit.Test
 

@@ -1,4 +1,4 @@
-package com.example.codeblockapp.ui.theme
+package com.example.codeblock.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
